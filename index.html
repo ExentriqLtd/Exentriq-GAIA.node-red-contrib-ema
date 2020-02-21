@@ -1,0 +1,50 @@
+<script type="text/javascript">
+    RED.nodes.registerType('move-card',{
+        category: 'EMA',
+        color: '#F2F2F2',
+        defaults: {
+            name: {value:""},
+            project: {value:""},
+            card: {value:""},
+            members: {value:""},
+            username: {value:RED.settings.user.username}
+        },
+        inputs:1,
+        outputs:1,
+        label: function() {
+            return this.name||"EMA-move-card";
+        },
+        icon: "exentriq.png",
+        oneditprepare: function(){
+            
+            var space = RED.settings.company.id;
+            
+            
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="move-card">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Title</label>
+        <input type="text" id="node-input-name" placeholder="The task title">
+    </div>
+	<div class="form-row">
+        <label for="node-input-card"><i class="icon-tag"></i> List</label>
+		<select id="node-input-card">
+		</select>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="move-card">
+    <p>EMA: Move Card.</p>
+	<p><b>Destination list</b>  <i>The list id where a card should be moved.</i></p>
+	
+	<p>
+	<ul>
+		<li><code>msg.card</code> The card id.
+		<li><code>msg.destination_list</code> The destination list id.
+	</ul>
+	</p>
+
+</script>
