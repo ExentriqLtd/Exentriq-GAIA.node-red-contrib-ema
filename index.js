@@ -28,7 +28,7 @@ function EmaMoveCard(n) {
 	    var data = { "destinationId":node.destination_list, "username": node.username };
 	    
 	    
-	    node.log("Move card:  " + msg.cardId);
+	    node.log("Move card:  " + msg.card);
 	    
 	    //node.send(msg);
 	    
@@ -38,7 +38,7 @@ function EmaMoveCard(n) {
 	    
 	    var post_options = {
 	      "host": host,
-	      "path": "/api/entity/"+msg.cardId+"/moveToList",
+	      "path": "/api/entity/"+msg.card+"/moveToList",
 	      "method": "POST",
               "headers": {
 	        "Content-Type": "application/json"
