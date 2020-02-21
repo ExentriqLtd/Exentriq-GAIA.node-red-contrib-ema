@@ -1,0 +1,264 @@
+
+<script type="text/javascript">
+    RED.nodes.registerType('bus-events',{
+        category: 'EMA',
+        color: '#F2F2F2',
+        defaults: {
+            name: {value:""},
+            event: {required:true},
+            group:{required:true},
+            propertyType: { value:"msg" },
+            rules: {value:[{t:"eq", v:""}]},
+            checkall: {value:"true", required:true},
+            outputs: {value:1}
+        },
+        inputs:0,
+        outputs:1,
+        label: function() {
+            return this.name||"New Event";
+        },
+        icon: "exentriq.ico",
+        oneditprepare: function(){
+	        
+	        var node = this;
+            var previousValueType = {value:"prev",label:this._("inject.previous"),hasValue:false};
+
+            $("#node-input-property").typedInput({default:this.propertyType||'msg',types:['msg','flow','global']});
+            var operators = [
+                {v:"Events",t:"Events"},
+                {v:"Entity",t:"Entity"},
+                {v:"EntityList",t:"Entity List"},
+                {v:"eq",t:"=="}
+            ];
+
+            var andLabel = "Activity Type";
+            
+            function resizeRule(rule) {
+                var newWidth = rule.width();
+                var selectField = rule.find("select");
+                var type = selectField.val()||"";
+                var valueField = rule.find(".node-input-rule-value");
+                var btwnField1 = rule.find(".node-input-rule-btwn-value");
+                var btwnField2 = rule.find(".node-input-rule-btwn-value2");
+                var selectWidth;
+                if (type.length < 4) {
+                    selectWidth = 60;
+                } else {
+                    selectWidth = 120;
+                }
+                selectField.width(selectWidth);
+                btwnField2.typedInput("width",(newWidth-selectWidth-70));
+                if (type === "eq") {
+                   valueField.typedInput("width",(newWidth-selectWidth-140))
+                   btwnField2.typedInput("width",(newWidth-selectWidth-140));
+                } else {
+                   valueField.typedInput("width",(newWidth-selectWidth-70));
+                }
+            }
+
+            $("#node-input-rule-container").css('min-height','250px').css('min-width','450px').editableList({
+                addItem: function(container,i,opt) {
+                    var rule = opt;
+                    if (!rule.hasOwnProperty('t')) {
+                        rule.t = 'eq';
+                    }
+                    var row = $('<div/>').appendTo(container);
+                    var row2 = $('<div/>',{style:"padding-top: 5px; padding-left: 175px;"}).appendTo(container);
+                    var row3 = $('<div/>',{style:"padding-top: 5px; padding-left: 0px;"}).appendTo(container);
+                    var firstLabel = $('<span/>',{style:"font-weight:bold; display:inline-block; width:90px;", class:"node-input-rule-btwn-label"}).text(" Event Type ").appendTo(row);
+                    var selectField = $('<select/>',{style:"width:120px; margin-left: 5px; text-align: center;"}).appendTo(row);
+                    for (var d in operators) {
+                        selectField.append($("<option></option>").val(operators[d].v).text(operators[d].t));
+                    }
+                    var valueField = $('<input/>',{class:"node-input-rule-value",type:"text",style:"margin-left: 5px;margin-right:2px;"}).appendTo(row).typedInput({default:'str',types:['str']});
+                    //var btwnValueField = $('<input/>',{class:"node-input-rule-btwn-value",type:"text",style:"margin-left: 5px;"}).appendTo(row).typedInput({default:'num',types:['msg','flow','global','str','num',previousValueType]});
+                    var btwnAndLabel = $('<span/>',{style:"font-weight:bold; display:inline-block; width:90px;", class:"node-input-rule-btwn-label"}).text(" "+andLabel+" ").appendTo(row3);
+                    var btwnValue2Field = $('<input/>',{class:"node-input-rule-btwn-value2",type:"text",style:"margin-left:5px;margin-right:2px;"}).appendTo(row3).typedInput({default:'str',types:['str']});
+                    var finalspan = $('<span/>',{style:"float: right;margin-top: 6px;"}).appendTo(row);
+                    finalspan.append(' &#8594; <span class="node-input-rule-index">'+(i+1)+'</span> ');
+                    
+                    selectField.change(function() {
+                        resizeRule(container);
+                        var type = selectField.val();
+						btwnValue2Field.typedInput('show');
+                        if (type !== "eq") {
+                                valueField.typedInput('hide');
+                        } else {
+                                valueField.typedInput('show');
+                        }
+						row2.hide();
+                        row3.show();
+                    });
+                    selectField.val(rule.t);
+                    valueField.typedInput('value',rule.v);
+                    valueField.typedInput('type',rule.vt||'str');
+                    if (true || rule.t == "btwn") {
+                        //btwnValueField.typedInput('value',rule.v);
+                        //btwnValueField.typedInput('type',rule.vt||'num');
+                        btwnValue2Field.typedInput('value',rule.v2);
+                        btwnValue2Field.typedInput('type',rule.v2t||'str');
+                    } else if (typeof rule.v != "undefined") {
+                        valueField.typedInput('value',rule.v);
+                        valueField.typedInput('type',rule.vt||'str');
+                    }
+                    selectField.change();
+                },
+                removeItem: function(opt) {
+                    var rules = $("#node-input-rule-container").editableList('items');
+                    rules.each(function(i) { $(this).find(".node-input-rule-index").html(i+1); });
+                },
+                resizeItem: resizeRule,
+                sortItems: function(rules) {
+                    var rules = $("#node-input-rule-container").editableList('items');
+                    rules.each(function(i) { $(this).find(".node-input-rule-index").html(i+1); });
+                },
+                sortable: true,
+                removable: true
+            });
+
+            for (var i=0;i<this.rules.length;i++) {
+                var rule = this.rules[i];
+                $("#node-input-rule-container").editableList('addItem',rule);
+            }
+            
+            var guid = function() {
+                function s4() {
+                  return Math.floor((1 + Math.random()) * 0x10000)
+                    .toString(16)
+                    .substring(1);
+                }
+                return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                  s4() + '-' + s4() + s4() + s4();
+              }
+            if(!this.group){
+        		this.group = guid();
+            }
+           
+        },
+        
+        oneditsave: function() {
+            var rules = $("#node-input-rule-container").editableList('items');
+            var ruleset;
+            var node = this;
+            node.rules= [];
+            rules.each(function(i) {
+                var rule = $(this);
+                var type = rule.find("select").val();
+                var r = {t:type};
+                if (type === "eq") {
+                    r.v = rule.find(".node-input-rule-value").typedInput('value');
+                    r.vt = rule.find(".node-input-rule-value").typedInput('type');
+                }
+                r.v2 = rule.find(".node-input-rule-btwn-value2").typedInput('value');
+                r.v2t = rule.find(".node-input-rule-btwn-value2").typedInput('type');
+                node.rules.push(r);
+            });
+            this.outputs = node.rules.length;
+            this.propertyType = $("#node-input-property").typedInput('type');
+        },
+        oneditresize: function(size) {
+            var rows = $("#dialog-form>div:not(.node-input-rule-container-row)");
+            var height = size.height;
+            for (var i=0;i<rows.size();i++) {
+                height -= $(rows[i]).outerHeight(true);
+            }
+            var editorRow = $("#dialog-form>div.node-input-rule-container-row");
+            height -= (parseInt(editorRow.css("marginTop"))+parseInt(editorRow.css("marginBottom")));
+            $("#node-input-rule-container").editableList('height',height);
+        }
+       
+    });
+</script>
+
+<script type="text/x-red" data-template-name="bus-events">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="the node name">
+    </div>
+    <div class="form-row node-input-rule-container-row">
+	    <ol id="node-input-rule-container"></ol>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="bus-events">
+    <p>Exentriq Events Receiver</p>
+
+	<p><b>Event Type</b>  <i>The event type</i>
+		<ul>
+			<li>Events</li>
+			<li>Entity</li>
+			<li>EntityList</li>
+		</ul>
+	</p>
+	<p><b>Activity Type</b>  <i>The activity type (Optional)</i>
+		<ul>
+			<li>taskCreated</li>
+			<li>archivedCard</li>
+			<li>archivedList</li>
+			<li>createList</li>
+			<li>cardMoved</li>
+		</ul>
+		
+		 </p>
+
+	<code style="display:block;white-space:pre-wrap">
+
+# Example Event
+
+{ 
+	topic: 'NewObjectEvent',
+	value: {
+		"uuid": "EMA-YYYY",
+		"type": "Events",
+		"creation_date": 1582099766197,
+		"data": {
+			"_id": "XXXX",
+			"activityType": "moveCard",
+			"userId": "ZZZZ",
+			"context": [{
+				"items": [{
+					"id": "3",
+					"name": "Exentriq",
+					"type": "space",
+					"closed": false
+				}, {
+					"id": "BqhrYXzGMg27ppie7",
+					"name": "Internal Support Requests",
+					"type": "board",
+					"closed": false
+				}, {
+					"id": "QeFZab2PsHz9Taziw",
+					"name": "BUTTON GENERAL INFO in SPACES LIST - Not working",
+					"type": "card",
+					"closed": false
+				}],
+				"ids": ["3", "BqhrYXzGMg27ppie7", "QeFZab2PsHz9Taziw"],
+				"ids2": ["BqhrYXzGMg27ppie7", "QeFZab2PsHz9Taziw"],
+				"items2": [{
+					"id": "BqhrYXzGMg27ppie7",
+					"name": "Internal Support Requests",
+					"type": "board",
+					"closed": false
+				}, {
+					"id": "QeFZab2PsHz9Taziw",
+					"name": "BUTTON GENERAL INFO in SPACES LIST - Not working",
+					"type": "card",
+					"closed": false
+				}]
+			}],
+			"title": "BUTTON GENERAL INFO in SPACES LIST - Not working",
+			"id": "QeFZab2PsHz9Taziw",
+			"listId": "KyN8mSgZDH7B8naFN",
+			"oldListId": "ad2RjB389cqWjQPvK",
+			"boardId": "BqhrYXzGMg27ppie7",
+			"cardId": "QeFZab2PsHz9Taziw",
+			"createdAt": "2020-02-19T08:09:26.197Z",
+			"spaceId": "3",
+			"username": "user3000"
+		}
+	}
+}
+
+	</code>
+
+</script>

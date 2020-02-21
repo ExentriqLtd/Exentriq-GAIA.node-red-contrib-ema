@@ -8,11 +8,13 @@
         "node-red"
     ],
     "dependencies": {
-        "follow-redirects": "^1.10.0"
+        "follow-redirects": "^1.10.0",
+        "kafka-node": "^5.0.0"
     },
     "node-red": {
         "nodes": {
-            "move-card": "index.js"
+            "move-card": "index.js",
+            "bus-events": "events.js"
         }
     }
 }
