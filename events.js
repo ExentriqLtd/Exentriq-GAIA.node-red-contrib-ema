@@ -1,30 +1,20 @@
 module.exports = function(RED) {
     "use strict";
-   
+    
     function ExentriqEventNode(config) {
         RED.nodes.createNode(this,config);
 
         var node = this;
 		this.rules = config.rules || [];
 
-       
-        var kafkaLogging = require('kafka-node/logging');
-		kafkaLogging.setLoggerProvider((name) => {
-		  return {
-		    debug: (message) => console.debug(`[${name}] ${message}`),
-		    info: (message) => console.log(`[${name}] ${message}`),
-		    warn: (message) => console.warn(`[${name}] ${message}`),
-		    error: (message) => console.error(`[${name}] ${message}`),
-		  }
-		});
-		 var kafka = require('kafka-node');
-        var HighLevelConsumer = kafka.Consumer;//HighLevelConsumer;
-        var Client = kafka.KafkaClient;//kafka.Client;
+        var kafka = require('kafka-node');
+        var HighLevelConsumer = kafka.HighLevelConsumer;
+        var Client = kafka.Client;
         var topics = "NewObjectEvent";
         var clusterZookeeper = RED.settings.exentriq.clusterZookeeper;
         var groupId = config.group;// || ;
         var type = config.event;
-        var space = config.owner? config.owner.split("-")[0] : 3; //this avoid the multiple flow problem ì, i.e: space 3-14
+        var space = config.owner.split("-")[0]; //this avoid the multiple flow problem ì, i.e: space 3-14
         var client; 
         var consumer;
 		
@@ -42,21 +32,21 @@ module.exports = function(RED) {
           try {
               client = new Client(clusterZookeeper);
               consumer = new HighLevelConsumer(client, topics, options);
-              node.log("Consumer created on space " + space + ", groupId " + groupId);
+              node.log("EMA Consumer created on space " + space + ", groupId " + groupId);
               node.status({fill:"green",shape:"dot",text:"connected to "+clusterZookeeper});
 			  var eventType = null;
 			  var activityType = null
 			  var msg = null;
               consumer.on('message', function (message) {
         	  try {
-        	      node.log("Consumer msg: " + message);
+        	      node.log("EMA Consumer msg: " + message);
         	      var event = JSON.parse(message.value);
         	      //node.log("Consumer event: " + event.type + " node.rules " + node.rules.length);
         	      eventType = event.type;
         	      if(event.data && event.data.activityType){
 	        	      activityType = event.data.activityType;
         	      }
-        	       node.log("Consumer activityType: " + activityType);
+        	       node.log("EMA Consumer activityType: " + activityType);
         	       var spaceId = event.data.spaceId;
         	       //some events miss spaceId and add it in a data.exentriqContext obj
         	       if(!spaceId && event.data.exentriqContext){
@@ -76,7 +66,7 @@ module.exports = function(RED) {
 	        	       }
 	        	       
         	       }
-        	       node.log("Consumer eventType: " + eventType + " on space " + spaceId);
+        	       node.log("EMA Consumer eventType: " + eventType + " on space " + spaceId);
         	      if(space == spaceId){//non è più legato solo a un evento && type == event.type){
 	        	     msg =  {payload: event};// {payload: event.entities[0].value};
                      //node.send(msg);
