@@ -38,7 +38,7 @@ function EmaMoveCard(n) {
 	    
 	    var post_options = {
 	      "host": host,
-	      "path": "/api/entity"+msg.cardId+"/moveToList",
+	      "path": "/api/entity/"+msg.cardId+"/moveToList",
 	      "method": "POST",
               "headers": {
 	        "Content-Type": "application/json"
