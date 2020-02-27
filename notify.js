@@ -28,7 +28,7 @@ function EmaNotify(n) {
 	    if(msg.destinationUsername){
 			node.destinationUsername = msg.destinationUsername;
 	    }
-	    
+	     
 	    if(!node.robotUsername){
 			    node.status({fill:"red",shape:"dot",text:"missing robot configuration"});
 			    node.send(msg);
@@ -45,7 +45,7 @@ function EmaNotify(n) {
 		    var destinationUsernameArray = node.destinationUsername.split(",");
 		    for(var i=0; i < destinationUsernameArray.length; i++){
 			    var to = destinationUsernameArray[i];
-			    var data = { "from":node.robotUsername, "to": to, "message": + node.message };
+			    var data = { "from":node.robotUsername, "to": to, "message": node.message };
 		    
 		        node.log("Talk notify to: " + to);
 			    
@@ -64,11 +64,11 @@ function EmaNotify(n) {
 			    }
 			     
 			    var post_options = {
-			      "host": host + "/api/rooms/sendDirectMessage",
-			      //"path": "/api/rooms/sendDirectMessage",
+			      "host": host,
+			      "path": "/api/rooms/sendDirectMessage",
 			      "method": "POST",
 		              "headers": {
-					  	//"Content-Type": "application/json"
+					  	"Content-Type": "application/json"
 		              }
 			    };
 			    
