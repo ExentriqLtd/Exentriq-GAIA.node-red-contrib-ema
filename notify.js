@@ -55,6 +55,8 @@ function EmaNotify(n) {
 			    
 			    node.log("Talk host: " + host);
 			    
+			    node.log("Talk post_data: " + post_data);
+			    
 			    if(!host){
 				    node.status({fill:"red",shape:"dot",text:"missing api configuration"});
 				    node.send(msg);
@@ -62,11 +64,11 @@ function EmaNotify(n) {
 			    }
 			     
 			    var post_options = {
-			      "host": host,
-			      "path": "/api/rooms/sendDirectMessage",
+			      "host": host + "/api/rooms/sendDirectMessage",
+			      //"path": "/api/rooms/sendDirectMessage",
 			      "method": "POST",
 		              "headers": {
-			        "Content-Type": "application/json"
+					  	//"Content-Type": "application/json"
 		              }
 			    };
 			    
