@@ -53,6 +53,10 @@ function EmaNotify(n) {
 			    
 			    var host = RED.settings.exentriq.talk;
 			    
+			    if(msg.host){
+					host = msg.host;
+				}
+			    
 			    node.log("Talk host: " + host);
 			    
 			    node.log("Talk post_data: " + post_data);
