@@ -1,0 +1,55 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ema-notifier',{
+        category: 'EMA',
+        color: '#F2F2F2',
+        defaults: {
+            name: {value:""},
+            destinationusername: {value: ""},
+            rusername: {value: "", required: true},
+            rpassword: {value: "", required: true}
+        },
+        inputs:1,
+        outputs:1,
+        label: function() {
+            return this.name||"Notify";
+        },
+        icon: "exentriq.png",
+        oneditprepare: function(){
+            
+            var space = RED.settings.company.id;
+            
+            
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="ema-notifier">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Title</label>
+        <input type="text" id="node-input-name" placeholder="The task title">
+    </div>
+    <div class="form-row">
+        <label for="node-input-destinationusername"><i class="icon-tag"></i> Recipients username csv</label>
+        <input type="text" id="node-input-destinationusername" placeholder="The recipent usernames">
+    </div>
+    <div class="form-row">
+        <label for="node-input-rusername"><i class="icon-tag"></i> Robot Username</label>
+        <input type="text" id="node-input-rusername" placeholder="The robot username">
+    </div>
+    <div class="form-row">
+        <label for="node-input-rpassword"><i class="icon-tag"></i> Robot Password</label>
+        <input type="password" id="node-input-rpassword" placeholder="">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="ema-notifier">
+    <p>EMA: Notify.</p>
+	
+	<p>
+	<ul>
+		<li><code>msg.card</code> The card id.
+		<li><code>msg.destination_list</code> The destination list id.
+	</ul>
+	</p>
+
+</script>
