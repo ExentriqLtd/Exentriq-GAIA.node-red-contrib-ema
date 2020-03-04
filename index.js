@@ -29,7 +29,7 @@ function EmaMoveCard(n) {
 		node.source_list = msg.source_list;
 	    }
 	    	    
-	    var data = { "destinationId":node.destination_list, "sourceId":node.source_list, "username": node.username };
+	    var data = { "destinationId":node.destination_list, "sourceListId":node.source_list, "username": node.username };
 	    
 	    
 	    node.log("Move card:  " + msg.card);
