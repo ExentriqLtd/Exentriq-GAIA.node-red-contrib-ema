@@ -38,6 +38,8 @@ function EmaMoveCard(n) {
 	    
 	    var post_data = JSON.stringify(data);
 	    
+	    node.log("Move data:  " + post_data);
+	    
 	    var host = RED.settings.exentriq.boardsApiHost;
 	    
 	    var post_options = {
