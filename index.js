@@ -11,6 +11,7 @@ function EmaMoveCard(n) {
 	this.card = n.card;
 	this.username = n.username;
 	this.destination_list = n.destination_list;
+	this.source_list = n.source_list;
 	
 	var node = this;
 	
@@ -24,8 +25,11 @@ function EmaMoveCard(n) {
 	    if(msg.destination_list){
 		node.destination_list = msg.destination_list;
 	    }
+	    if(msg.source_list){
+		node.source_list = msg.source_list;
+	    }
 	    	    
-	    var data = { "destinationId":node.destination_list, "username": node.username };
+	    var data = { "destinationId":node.destination_list, "sourceId":node.source_list, "username": node.username };
 	    
 	    
 	    node.log("Move card:  " + msg.card);
