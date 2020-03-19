@@ -39,14 +39,14 @@ module.exports = function(RED) {
 			  var msg = null;
               consumer.on('message', function (message) {
         	  try {
-        	      node.log("EMA Consumer msg: " + message);
+        	      //node.log("EMA Consumer msg: " + message);
         	      var event = JSON.parse(message.value);
         	      //node.log("Consumer event: " + event.type + " node.rules " + node.rules.length);
         	      eventType = event.type;
         	      if(event.data && event.data.activityType){
 	        	      activityType = event.data.activityType;
         	      }
-        	       node.log("EMA Consumer activityType: " + activityType);
+        	      // node.log("EMA Consumer activityType: " + activityType);
         	       var spaceId = event.data.spaceId;
         	       //some events miss spaceId and add it in a data.exentriqContext obj
         	       if(!spaceId && event.data.exentriqContext){
@@ -66,7 +66,7 @@ module.exports = function(RED) {
 	        	       }
 	        	       
         	       }
-        	       node.log("EMA Consumer eventType: " + eventType + " on space " + spaceId);
+        	       //node.log("EMA Consumer eventType: " + eventType + " on space " + spaceId);
         	      if(space == spaceId){//non è più legato solo a un evento && type == event.type){
 	        	     msg =  {payload: event};// {payload: event.entities[0].value};
                      //node.send(msg);
