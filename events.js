@@ -147,7 +147,7 @@ module.exports = function(RED) {
           }
         }
 
-        createConsumer(true, this, client);
+        //createConsumer(true, this, client);
         
         node.on('close', function() {
             consumer.close();
