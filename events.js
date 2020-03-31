@@ -132,7 +132,6 @@ module.exports = function(RED) {
 
 
               consumer.on('error', function (err) {
-                 console.error(err);
                  node.status({fill:"red",shape:"dot",text:"NOT connected to "+clusterZookeeper});
                  consumer.close();
                  if(retry){
