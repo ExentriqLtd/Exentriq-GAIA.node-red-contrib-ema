@@ -3,7 +3,7 @@ module.exports = function(RED) {
 var http = require("follow-redirects").http;
 var https = require("follow-redirects").https;
 var rest = require('rest');
-    
+
 function EmaGetEntity(n) {
 	RED.nodes.createNode(this,n);
 	//console.log(n);
@@ -50,6 +50,12 @@ function EmaGetEntity(n) {
 	    	    
 	    node.log("Get card:  " + msg.entity + " robot " + node.robotUsername);
 	    
+	    if(!node.robotSessionToken){
+		    node.status({fill:"red",shape:"dot",text:"wrong credentials!"});
+			msg.payload = err;
+			node.send(msg);
+			return;
+	    }
 	    
 	    var host = RED.settings.exentriq.boardsApiHost;
 	    
@@ -66,7 +72,7 @@ function EmaGetEntity(n) {
 	    
 	    console.log(post_options);
 	    
-	    node.status({fill:"green",shape:"dot",text:"get info..."});
+	    node.status({fill:"green",shape:"dot",text:"get entity info..."});
 	    var post_req = https.request(post_options, function (res) {
 			res.setEncoding('utf8');
 			res.on('data', function (chunk) {
@@ -74,12 +80,14 @@ function EmaGetEntity(n) {
 				msg.payload = chunk;
 				node.send(msg);
 			});
+			
 	    }).on('error', function (err) {
 			node.status({fill:"red",shape:"dot",text:"get error!"});
 			msg.payload = err;
 			node.send(msg);
 	    });
-		
+	    
+	    
 	    post_req.end();
 	});
 }
