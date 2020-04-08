@@ -17,7 +17,8 @@
             "move-card": "index.js",
             "bus-events": "events.js",
             "get-entity": "entity_info.js",
-            "ema-notifier": "notify.js"
+            "ema-notifier": "notify.js",
+            "exentriq-robot-auth": "auth.js"
         }
     }
 }

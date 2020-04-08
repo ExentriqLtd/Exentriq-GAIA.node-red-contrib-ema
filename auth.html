@@ -1,0 +1,52 @@
+<script type="text/javascript">
+    RED.nodes.registerType('exentriq-robot-auth',{
+        category: 'EMA',
+        color: '#F2F2F2',
+        defaults: {
+            name: {value:""},
+            project: {value:""},
+            entity: {value:""},
+            rusername: {value: "", required: true},
+            rpassword: {value: "", required: true},
+            username: {value:RED.settings.user.username}
+        },
+        inputs:1,
+        outputs:1,
+        label: function() {
+            return this.name||"Exentriq Auth";
+        },
+        icon: "exentriq.png",
+        oneditprepare: function(){
+            
+            var space = RED.settings.company.id;
+            
+            
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="exentriq-robot-auth">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Title</label>
+        <input type="text" id="node-input-name" placeholder="The task title">
+    </div>
+    <div class="form-row">
+        <label for="node-input-rusername"><i class="icon-tag"></i> Robot Username</label>
+        <input type="text" id="node-input-rusername" placeholder="The robot username">
+    </div>
+    <div class="form-row">
+        <label for="node-input-rpassword"><i class="icon-tag"></i> Robot Password</label>
+        <input type="password" id="node-input-rpassword" placeholder="">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="exentriq-robot-auth">
+    <p>Exentriq: Authenticate the robot.</p>
+	
+	<p>
+	<ul>
+		
+	</ul>
+	</p>
+
+</script>
