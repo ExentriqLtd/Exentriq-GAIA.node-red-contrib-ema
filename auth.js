@@ -43,7 +43,7 @@ function ExentriqAuth(n) {
 			
 			var entity=JSON.stringify({ id: '', method: msg.api, params: msg.payload });
 			console.log("processResponse " + entity);
-			rest({path:exentriqServicePath, method:"POST", entity:entity}).then(function(result) {
+			rest({path:exentriqServicePath +"?sid=" + node.robotSessionToken, method:"POST", entity:entity}).then(function(result) {
 				console.log(result);
 		       if(result && result.entity && JSON.parse(result.entity).result){
 			       msg.payload = JSON.parse(result.entity).result;
