@@ -42,9 +42,9 @@ function ExentriqAuth(n) {
 		if(msg.api){
 			
 			var entity=JSON.stringify({ id: '', method: msg.api, params: msg.payload });
-			//console.log("processResponse " + entity);
+			console.log("processResponse " + entity);
 			rest({path:exentriqServicePath +"?sid=" + node.robotSessionToken, method:"POST", entity:entity}).then(function(result) {
-			//console.log(result);
+			console.log(result);
 		       if(result && result.entity && JSON.parse(result.entity).result){
 			       msg.payload = JSON.parse(result.entity).result;
 			       node.send(msg)
@@ -58,10 +58,10 @@ function ExentriqAuth(n) {
 	}
 	
 	node.on("input", function(msg) {
-		//console.log("input " + msg.payload);
+		console.log("input " + msg.payload);
 		var entity=JSON.stringify({ id: '', method: 'auth.getSessionOwnerBySid', params: [node.robotSessionToken] });
 		 rest({path:exentriqServicePath, method:"POST", entity:entity}).then(function(result) {
-	       //console.log(result);
+	       console.log(result);
 	       if(result && result.entity && JSON.parse(result.entity).result){
 		        processResponse(msg)
 		   }else{
@@ -69,11 +69,11 @@ function ExentriqAuth(n) {
 			   
 			   var entity=JSON.stringify({ id: '', method: 'auth.login', params: [node.robotUsername, node.robotPassword] });
 			   rest({path:exentriqServicePath, method:"POST", entity:entity}).then(function(result) {
-			       //console.log(result);
+			       console.log(result);
 			       if(result && result.entity && JSON.parse(result.entity).result){
-				       //console.log(result.entity);
+				       console.log(result.entity);
 				   		node.robotSessionToken = JSON.parse(result.entity).result.sessionToken;
-				   		//console.log(node.robotSessionToken);
+				   		console.log(node.robotSessionToken);
 				   		node.status({fill:"green",shape:"dot",text:"I am " + node.robotUsername});
 				   		processResponse(msg)
 				   }else{
