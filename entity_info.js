@@ -14,6 +14,7 @@ function EmaGetEntity(n) {
 	this.robotUsername = n.rusername;
 	this.robotPassword = n.rpassword;
 	this.robotSessionToken = null;
+	this.format = n.format;
 	
 	var exentriqServicePath = RED.settings.exentriq.rpc;;
 	var node = this;
@@ -52,8 +53,7 @@ function EmaGetEntity(n) {
 	    
 	    if(!node.robotSessionToken){
 		    node.status({fill:"red",shape:"dot",text:"wrong credentials!"});
-			msg.payload = err;
-			node.send(msg);
+			node.send(null);
 			return;
 	    }
 	    
@@ -71,13 +71,22 @@ function EmaGetEntity(n) {
 	    };
 	    
 	    console.log(post_options);
-	    
+	    msg.payload = "";
+	    //https://nodejs.org/api/http.html#http_request_write_chunk_encoding_callback
 	    node.status({fill:"green",shape:"dot",text:"get entity info..."});
 	    var post_req = https.request(post_options, function (res) {
 			res.setEncoding('utf8');
 			res.on('data', function (chunk) {
-			        node.status({});
-				msg.payload = chunk;
+				//console.log("chunk")
+			    node.status({});
+				msg.payload += chunk;
+				
+			});
+			res.on('end', function () {
+			    //console.log("end")
+			    if(node.format == "json"){
+				    msg.payload = JSON.parse(msg.payload);
+			    }
 				node.send(msg);
 			});
 			

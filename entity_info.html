@@ -8,7 +8,8 @@
             entity: {value:""},
             rusername: {value: "", required: true},
             rpassword: {value: "", required: true},
-            username: {value:RED.settings.user.username}
+            username: {value:RED.settings.user.username},
+            format: {value: ""}
         },
         inputs:1,
         outputs:1,
@@ -38,6 +39,15 @@
         <label for="node-input-rpassword"><i class="icon-tag"></i> Robot Password</label>
         <input type="password" id="node-input-rpassword" placeholder="">
     </div>
+    
+    <div class="form-row">
+	    <label for="node-input-format"  style="width: 150px;"> Return</label>
+	    <select type="text" id="node-input-format" style="vertical-align: middle;">
+	      <option value="raw">UTF-8 string</option>
+	      <option value="json">parsed JSON Object</option>
+	    </select>
+	</div>
+    
 </script>
 
 <script type="text/x-red" data-help-name="get-entity">
