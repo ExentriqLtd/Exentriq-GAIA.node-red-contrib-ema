@@ -10,7 +10,6 @@ function EmaGetEntity(n) {
 	this.space = n.space;
 	this.name = n.name;
 	this.entity = n.entity;
-	this.username = n.username;
 	this.robotUsername = n.rusername;
 	this.robotPassword = n.rpassword;
 	this.robotSessionToken = null;
