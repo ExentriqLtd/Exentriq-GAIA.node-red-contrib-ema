@@ -34,7 +34,7 @@ function EmaNotify(n) {
 	    }
 	     
 	    if(!node.robotUsername){
-			    node.status({fill:"red",shape:"dot",text:"missing robot configuration"});
+			    node.status({fill:"red",shape:"dot",text:"missing sender configuration"});
 			    node.send(msg);
 			    return;
 		}
