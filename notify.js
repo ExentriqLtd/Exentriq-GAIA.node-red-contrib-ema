@@ -25,6 +25,10 @@ function EmaNotify(n) {
 			node.message = msg.message;
 	    }
 	    
+	    if(msg.robotUsername){
+			node.robotUsername = msg.robotUsername;
+		}
+	    
 	    if(msg.destinationUsername){
 			node.destinationUsername = msg.destinationUsername;
 	    }
