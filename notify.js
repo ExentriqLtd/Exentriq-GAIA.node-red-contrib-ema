@@ -80,7 +80,7 @@ function EmaNotify(n) {
 		              }
 			    };
 			    
-			    node.status({fill:"green",shape:"dot",text:"moving card..."});
+			    node.status({fill:"green",shape:"dot",text:"sending..."});
 			    var post_req = https.request(post_options, function (res) {
 					res.setEncoding('utf8');
 					res.on('data', function (chunk) {
