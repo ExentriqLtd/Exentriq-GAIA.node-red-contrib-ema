@@ -187,6 +187,7 @@ module.exports = function(RED) {
             this.callback = function(req,res) {
                 var msgid = RED.util.generateId();
                 res._msgid = msgid;
+                node.log("req.body " + req.body);
                 var payload = JSON.parse(req.body);
                 if(!payload.formId){
 	                node.warn("no form id ");
