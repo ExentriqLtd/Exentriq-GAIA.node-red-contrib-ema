@@ -175,6 +175,7 @@ module.exports = function(RED) {
             this.url = "/"+n.owner+n.url;
             this.method = n.method;
             this.swaggerDoc = n.swaggerDoc;
+            this.formid = n.formid;
 
             var node = this;
 
@@ -186,7 +187,12 @@ module.exports = function(RED) {
             this.callback = function(req,res) {
                 var msgid = RED.util.generateId();
                 res._msgid = msgid;
-                if (node.method.match(/^(post|delete|put|options|patch)$/)) {
+                var payload = JSON.parse(req.body);
+                if(!payload.formId){
+	                node.warn("no form id ");
+                }else if(payload.formId != node.formid){
+	                node.warn("bad form id " + payload.formId);
+                }else if (node.method.match(/^(post|delete|put|options|patch)$/)) {
                     node.send({_msgid:msgid,req:req,res:createResponseWrapper(node,res),payload:req.body});
                 } else if (node.method == "get") {
                     node.send({_msgid:msgid,req:req,res:createResponseWrapper(node,res),payload:req.query});
