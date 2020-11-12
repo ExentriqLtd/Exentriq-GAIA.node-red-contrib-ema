@@ -10,7 +10,16 @@
     "dependencies": {
         "follow-redirects": "^1.10.0",
         "kafka-node": "0.5.9",
-        "rest": "^2.0.0"
+        "rest": "^2.0.0",
+        "body-parser": "^1.15.2",
+        "connect-busboy": "0.0.2",
+        "cors": "^2.8.1",
+        "formidable": "^1.0.17",
+        "is-utf8": "^0.2.1",
+        "media-typer": "^0.3.0",
+        "multer": "^1.2.0",
+        "on-headers": "^1.0.1",
+        "raw-body": "^2.1.7"
     },
     "node-red": {
         "nodes": {
@@ -18,7 +27,8 @@
             "bus-events": "events.js",
             "get-entity": "entity_info.js",
             "ema-notifier": "notify.js",
-            "exentriq-robot-auth": "auth.js"
+            "exentriq-robot-auth": "auth.js",
+            "form-in": "form_in.js"
         }
     }
 }
