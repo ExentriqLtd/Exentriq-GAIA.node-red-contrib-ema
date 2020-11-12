@@ -33,14 +33,7 @@
         <label for="node-input-formid"><i class="fa fa-tag"></i> Form ID</label>
         <input type="text" id="node-input-formid">
     </div-->
-    <div class="form-row">
-        <label for="node-input-rusername"><i class="icon-tag"></i> Robot Username</label>
-        <input type="text" id="node-input-rusername" placeholder="The robot username">
-    </div>
-    <div class="form-row">
-        <label for="node-input-rpassword"><i class="icon-tag"></i> Robot Password</label>
-        <input type="password" id="node-input-rpassword" placeholder="">
-    </div>
+    
     <div class="form-row">
         <label for="node-input-myforms"><i class="fa fa-tasks"></i> My Forms</label>
         <select disabled type="text" id="node-input-myforms" style="width:70%;">
@@ -91,8 +84,6 @@
             method: {value:"post",required:true},
             //formid: {value:"",required:true},
             swaggerDoc: {type:"swagger-doc", required:false},
-            rusername: {value: "", required: true},
-            rpassword: {value: "", required: true},
             myforms: {value:"",required:true}
         },
         inputs:0,
@@ -126,24 +117,11 @@
 	        function loadForms(node){
 	      
 		        var exentriqServicePath = RED.settings.exentriq? RED.settings.exentriq.rpc : "https://stage.exentriq.com/JSON-RPC";
-		        var entity=JSON.stringify({ id: '', method: 'auth.login', params: [$("#node-input-rusername").val(), $("#node-input-rpassword").val()] });
-		         
-		       //var node = this;
-		        //var entity=JSON.stringify({ id: '', method: 'spaceFormService.getListForms', params: [53111] });
-			    $.ajax({
-			        url: exentriqServicePath,
-			        method: 'POST',
-			        data: entity
-			    }).then(function(result) {
-				    
-				    if(result && result.result){
-					        console.log(result);
-					   		var robotSessionToken = result.result.sessionToken;
-					   		//console.log(node.robotSessionToken);
-					   		//node.status({fill:"green",shape:"dot",text:"I am " + node.robotUsername});
-					   		entity=JSON.stringify({ id: '', method: 'spaceFormService.getListForms', params: [53111] });
+		        var spaceId = node.owner;
+		        console.log("spaceId " + spaceId)
+		        var entity=JSON.stringify({ id: '', method: 'spaceFormService.getListFormsIds', params: [spaceId] });
 					   		$.ajax({
-						        url: exentriqServicePath+ "?sid=" + robotSessionToken,
+						        url: exentriqServicePath,
 						        method: 'POST',
 						        data: entity
 						    }).then(function(res) {
@@ -168,15 +146,7 @@
 								   	//$("#node-input-myforms").val(node.myforms)
 							   	}
 					   			
-					   		})
-					   		
-					   }else{
-						   //node.status({fill:"red",shape:"dot",text:"Not logged"});
-						    //node.send(null);
-					   }
-				    
-			        //$("#node-input-myforms").append("<option value='aaa'>bbb</option>")
-			    });  
+					   		}) 
 		        
 	        }
 
