@@ -18,11 +18,7 @@
     <div class="form-row">
         <label for="node-input-method"><i class="fa fa-tasks"></i> <span data-i18n="httpin.label.method"></span></label>
         <select type="text" id="node-input-method" style="width:70%;">
-        <option value="get">GET</option>
         <option value="post">POST</option>
-        <option value="put">PUT</option>
-        <option value="delete">DELETE</option>
-        <option value="patch">PATCH</option>
         </select>
     </div>
     <div class="form-row">
@@ -73,7 +69,7 @@
         defaults: {
             name: {value:""},
             url: {value:"",required:true},
-            method: {value:"get",required:true},
+            method: {value:"post",required:true},
             swaggerDoc: {type:"swagger-doc", required:false}
         },
         inputs:0,
