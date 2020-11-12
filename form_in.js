@@ -14,27 +14,56 @@
  * limitations under the License.
  **/
 
-/** 
- * Multer modifications Licensed under the MIT License
- * Copyright (C) 2016, John O'Connor
- **/
 module.exports = function(RED) {
     "use strict";
     var bodyParser = require("body-parser");
+    var cookieParser = require("cookie-parser");
     var getBody = require('raw-body');
     var cors = require('cors');
-    var jsonParser = bodyParser.json({defer: true});
-    var urlencParser = bodyParser.urlencoded({extended:true, defer: true});
+    var jsonParser = bodyParser.json();
+    var urlencParser = bodyParser.urlencoded({extended:true});
     var onHeaders = require('on-headers');
     var typer = require('media-typer');
-    // Use multer for parsing multi-part forms with fil
-    var multer = require('multer');
-    var upload = multer({
-        "dest": "/tmp"
-    });
     var isUtf8 = require('is-utf8');
-    var formidable = require('formidable');
-    
+
+    function rawBodyParser(req, res, next) {
+        if (req.skipRawBodyParser) { next(); } // don't parse this if told to skip
+        if (req._body) { return next(); }
+        req.body = "";
+        req._body = true;
+
+        var isText = true;
+        var checkUTF = false;
+
+        if (req.headers['content-type']) {
+            var parsedType = typer.parse(req.headers['content-type'])
+            if (parsedType.type === "text") {
+                isText = true;
+            } else if (parsedType.subtype === "xml" || parsedType.suffix === "xml") {
+                isText = true;
+            } else if (parsedType.type !== "application") {
+                isText = false;
+            } else if (parsedType.subtype !== "octet-stream") {
+                checkUTF = true;
+            } else {
+                // applicatino/octet-stream
+                isText = false;
+            }
+        }
+
+        getBody(req, {
+            length: req.headers['content-length'],
+            encoding: isText ? "utf8" : null
+        }, function (err, buf) {
+            if (err) { return next(err); }
+            if (!isText && checkUTF && isUtf8(buf)) {
+                buf = buf.toString()
+            }
+            req.body = buf;
+            next();
+        });
+    }
+
     var corsSetup = false;
 
     function createRequestWrapper(node,req) {
@@ -73,7 +102,7 @@ module.exports = function(RED) {
         toWrap.forEach(function(f) {
             if (typeof req[f] === "function") {
                 wrapper[f] = function() {
-                    node.warn(RED._("httpInMultipart.errors.deprecated-call",{method:"msg.req."+f}));
+                    node.warn(RED._("httpin.errors.deprecated-call",{method:"msg.req."+f}));
                     var result = req[f].apply(req,arguments);
                     if (result === req) {
                         return wrapper;
@@ -89,7 +118,6 @@ module.exports = function(RED) {
 
         return wrapper;
     }
-    
     function createResponseWrapper(node,res) {
         var wrapper = {
             _res: res
@@ -120,7 +148,7 @@ module.exports = function(RED) {
         ];
         toWrap.forEach(function(f) {
             wrapper[f] = function() {
-                node.warn(RED._("httpInMultipart.errors.deprecated-call",{method:"msg.res."+f}));
+                node.warn(RED._("httpin.errors.deprecated-call",{method:"msg.res."+f}));
                 var result = res[f].apply(res,arguments);
                 if (result === res) {
                     return wrapper;
@@ -138,73 +166,20 @@ module.exports = function(RED) {
         corsHandler = cors(RED.settings.httpNodeCors);
         RED.httpNode.options("*",corsHandler);
     }
-    
+
     function FormIn(n) {
         RED.nodes.createNode(this,n);
         if (RED.settings.httpNodeRoot !== false) {
+
             if (!n.url) {
-                this.warn(RED._("httpInMultipart.errors.missing-path"));
+                this.warn(RED._("httpin.errors.missing-path"));
                 return;
             }
             this.url = n.url;
-            this.method = "POST";//n.method;
+            this.method = n.method;
             this.swaggerDoc = n.swaggerDoc;
-            this.fields = n.fields;
+
             var node = this;
-            
-            this.rawBodyParser = function(req, res, next) {
-                if (req._body) { return next(); }
-                req.body = "";
-                req._body = true;
-                
-                var isText = true;
-                    var checkUTF = false;
-                    var isMultiPart = false;
-            
-                    if (req.headers['content-type']) {
-                        var parsedType = typer.parse(req.headers['content-type'])
-                        if (parsedType.type == "multipart") {
-                            isText = false;
-                            isMultiPart = true;
-                        }
-                        else if (parsedType.type === "text") {
-                            isText = true;
-                        } else if (parsedType.subtype === "xml" || parsedType.suffix === "xml") {
-                            isText = true;
-                        } else if (parsedType.type !== "application") {
-                            isText = false;
-                        } else if (parsedType.subtype !== "octet-stream") {
-                            checkUTF = true;
-                        }
-                    }
-                    
-                    if (isMultiPart) {
-                        var fields = JSON.parse(node.fields);
-                        upload.fields(fields)(req, res, function (err) {
-                            if (err) {
-                                next(err);
-                            } else {
-                                next();
-                            }
-                        });
-                    } else {
-                        getBody(req, {
-                            length: req.headers['content-length'],
-                            encoding: isText ? "utf8" : null
-                        }, function (err, buf) {
-                            if (err) { return next(err); }
-                            if (!isText && checkUTF && isUtf8(buf)) {
-                                buf = buf.toString();
-                                req.body = buf;
-                                next();
-                            } else {
-                                req.body = buf;
-                                next();
-                            }
-                            // req.body = buf;
-                        });
-                    }
-                };
 
             this.errorHandler = function(err,req,res,next) {
                 node.warn(err);
@@ -214,7 +189,7 @@ module.exports = function(RED) {
             this.callback = function(req,res) {
                 var msgid = RED.util.generateId();
                 res._msgid = msgid;
-                if (node.method.match(/(^post$|^delete$|^put$|^options$)/)) {
+                if (node.method.match(/^(post|delete|put|options|patch)$/)) {
                     node.send({_msgid:msgid,req:req,res:createResponseWrapper(node,res),payload:req.body});
                 } else if (node.method == "get") {
                     node.send({_msgid:msgid,req:req,res:createResponseWrapper(node,res),payload:req.query});
@@ -232,7 +207,6 @@ module.exports = function(RED) {
             }
 
             var metricsHandler = function(req,res,next) { next(); }
-
             if (this.metric()) {
                 metricsHandler = function(req, res, next) {
                     var startAt = process.hrtime();
@@ -251,12 +225,18 @@ module.exports = function(RED) {
                 };
             }
 
-            if (this.method == "post") {
-                RED.httpNode.post(this.url,httpMiddleware,corsHandler,metricsHandler,jsonParser, urlencParser, this.rawBodyParser, this.callback,this.errorHandler);
+            if (this.method == "get") {
+                RED.httpNode.get(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,this.callback,this.errorHandler);
+            } else if (this.method == "post") {
+                RED.httpNode.post(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,rawBodyParser,this.callback,this.errorHandler);
             } else if (this.method == "put") {
-                RED.httpNode.put(this.url,httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,this.rawBodyParser,this.callback,this.errorHandler);
+                RED.httpNode.put(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,rawBodyParser,this.callback,this.errorHandler);
+            } else if (this.method == "patch") {
+                RED.httpNode.patch(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,rawBodyParser,this.callback,this.errorHandler);
+            } else if (this.method == "delete") {
+                RED.httpNode.delete(this.url,cookieParser(),httpMiddleware,corsHandler,metricsHandler,jsonParser,urlencParser,rawBodyParser,this.callback,this.errorHandler);
             }
-            
+
             this.on("close",function() {
                 var node = this;
                 RED.httpNode._router.stack.forEach(function(route,i,routes) {
@@ -266,7 +246,7 @@ module.exports = function(RED) {
                 });
             });
         } else {
-            this.warn(RED._("httpInMultipart.errors.not-created"));
+            this.warn(RED._("httpin.errors.not-created"));
         }
     }
     RED.nodes.registerType("form-in",FormIn);
