@@ -29,10 +29,25 @@
         <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
         <input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name">
     </div>
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Form ID</label>
+    <!--div class="form-row">
+        <label for="node-input-formid"><i class="fa fa-tag"></i> Form ID</label>
         <input type="text" id="node-input-formid">
+    </div-->
+    <div class="form-row">
+        <label for="node-input-rusername"><i class="icon-tag"></i> Robot Username</label>
+        <input type="text" id="node-input-rusername" placeholder="The robot username">
     </div>
+    <div class="form-row">
+        <label for="node-input-rpassword"><i class="icon-tag"></i> Robot Password</label>
+        <input type="password" id="node-input-rpassword" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-myforms"><i class="fa fa-tasks"></i> My Forms</label>
+        <select disabled type="text" id="node-input-myforms" style="width:70%;">
+        
+        </select>
+    </div>
+    
     <div class="form-row row-swagger-doc" style="display: none">
         <label for="node-input-swaggerDoc"><i class="fa fa-file-text-o"></i> <span data-i18n="httpin.label.doc"></span></label>
         <input type="text" id="node-input-swaggerDoc">
@@ -74,8 +89,11 @@
             name: {value:""},
             url: {value:"/mailNotification",required:true},
             method: {value:"post",required:true},
-            formid: {value:"",required:true},
-            swaggerDoc: {type:"swagger-doc", required:false}
+            //formid: {value:"",required:true},
+            swaggerDoc: {type:"swagger-doc", required:false},
+            rusername: {value: "", required: true},
+            rpassword: {value: "", required: true},
+            myforms: {value:"",required:true}
         },
         inputs:0,
         outputs:1,
@@ -93,7 +111,7 @@
                 } else {
                     root += this.url;
                 }
-                return "form " + this.formid;
+                return "form " + this.myforms;
             } else {
                 return RED.settings.httpNodeRoot;
             }
@@ -101,7 +119,82 @@
         labelStyle: function() {
             return this.name?"node_label_italic":"";
         },
+                
         oneditprepare: function() {
+	        
+	        
+	        function loadForms(node){
+	      
+		        var exentriqServicePath = RED.settings.exentriq? RED.settings.exentriq.rpc : "https://stage.exentriq.com/JSON-RPC";
+		        var entity=JSON.stringify({ id: '', method: 'auth.login', params: [$("#node-input-rusername").val(), $("#node-input-rpassword").val()] });
+		         
+		       //var node = this;
+		        //var entity=JSON.stringify({ id: '', method: 'spaceFormService.getListForms', params: [53111] });
+			    $.ajax({
+			        url: exentriqServicePath,
+			        method: 'POST',
+			        data: entity
+			    }).then(function(result) {
+				    
+				    if(result && result.result){
+					        console.log(result);
+					   		var robotSessionToken = result.result.sessionToken;
+					   		//console.log(node.robotSessionToken);
+					   		//node.status({fill:"green",shape:"dot",text:"I am " + node.robotUsername});
+					   		entity=JSON.stringify({ id: '', method: 'spaceFormService.getListForms', params: [53111] });
+					   		$.ajax({
+						        url: exentriqServicePath+ "?sid=" + robotSessionToken,
+						        method: 'POST',
+						        data: entity
+						    }).then(function(res) {
+					   		
+					   			$("#node-input-myforms").removeAttr("disabled");
+					   			var list = res.result.list;
+					   			for(var i=0; i < list.length; i++){
+						   			if(i == 0){
+							   			if(node.myforms == ""){
+								   			node.myforms = list[i].id;
+							   			}else{
+								   			
+							   			}
+						   			}
+					   				$("#node-input-myforms").append("<option value='" + list[i].id + "'>" +list[i].title + "</option>")
+					   			}
+					   			
+					   			console.log("node.myforms " + node.myforms);
+					   			if(node.myforms != ""){
+						   			console.log($("option[value=" + node.myforms + "]"));
+								   	$("option[value=" + node.myforms + "]").attr("selected", "selected");
+								   	//$("#node-input-myforms").val(node.myforms)
+							   	}
+					   			
+					   		})
+					   		
+					   }else{
+						   //node.status({fill:"red",shape:"dot",text:"Not logged"});
+						    //node.send(null);
+					   }
+				    
+			        //$("#node-input-myforms").append("<option value='aaa'>bbb</option>")
+			    });  
+		        
+	        }
+
+	        
+	        console.log("this.myforms" + this.myforms);
+	        var robotUsername = $("#node-input-rusername").val();
+	        var robotPassword = $("#node-input-rpassword").val();
+	        
+			var node = this;
+			loadForms(node);
+			
+			$("#node-input-rpassword").on("blur", function(){
+				loadForms(node);
+			})
+			$("#node-input-rusername").on("blur", function(){
+				loadForms(node);
+			})
+	        
             var root = RED.settings.httpNodeRoot;
             if (root.slice(-1) == "/") {
                 root = root.slice(0,-1);

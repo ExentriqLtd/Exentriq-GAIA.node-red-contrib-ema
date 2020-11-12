@@ -172,12 +172,14 @@ module.exports = function(RED) {
                 this.warn(RED._("httpin.errors.missing-path"));
                 return;
             }
+            var node = this;
+            node.log("config " + n.myforms);
             this.url = "/"+n.owner+n.url;
             this.method = n.method;
             this.swaggerDoc = n.swaggerDoc;
-            this.formid = n.formid;
+            this.formid = n.myforms;
 
-            var node = this;
+            
 
             this.errorHandler = function(err,req,res,next) {
                 node.warn(err);
