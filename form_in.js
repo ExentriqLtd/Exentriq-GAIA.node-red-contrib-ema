@@ -146,7 +146,7 @@ module.exports = function(RED) {
                 this.warn(RED._("httpInMultipart.errors.missing-path"));
                 return;
             }
-            this.url = "/mailNotification";
+            this.url = n.url;
             this.method = "POST";//n.method;
             this.swaggerDoc = n.swaggerDoc;
             this.fields = n.fields;
