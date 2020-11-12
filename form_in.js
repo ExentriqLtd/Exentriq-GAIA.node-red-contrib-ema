@@ -45,9 +45,6 @@ module.exports = function(RED) {
                 isText = false;
             } else if (parsedType.subtype !== "octet-stream") {
                 checkUTF = true;
-            } else {
-                // applicatino/octet-stream
-                isText = false;
             }
         }
 
@@ -175,7 +172,7 @@ module.exports = function(RED) {
                 this.warn(RED._("httpin.errors.missing-path"));
                 return;
             }
-            this.url = n.url;
+            this.url = "/"+n.owner+n.url;
             this.method = n.method;
             this.swaggerDoc = n.swaggerDoc;
 
@@ -250,4 +247,5 @@ module.exports = function(RED) {
         }
     }
     RED.nodes.registerType("form-in",FormIn);
+
 }
