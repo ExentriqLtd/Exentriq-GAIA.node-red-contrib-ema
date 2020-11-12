@@ -188,7 +188,7 @@ module.exports = function(RED) {
                 var msgid = RED.util.generateId();
                 res._msgid = msgid;
                 node.log("req.body " + req.body);
-                var payload = JSON.parse(req.body);
+                var payload = req.body;
                 if(!payload.formId){
 	                node.warn("no form id ");
                 }else if(payload.formId != node.formid){
