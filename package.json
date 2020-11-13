@@ -28,8 +28,7 @@
             "bus-events": "events.js",
             "get-entity": "entity_info.js",
             "ema-notifier": "notify.js",
-            "exentriq-robot-auth": "auth.js",
-            "form-in": "form_in.js"
+            "exentriq-robot-auth": "auth.js"
         }
     }
 }
