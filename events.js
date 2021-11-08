@@ -14,7 +14,17 @@ module.exports = function(RED) {
         var clusterZookeeper = RED.settings.exentriq.clusterZookeeper;
         var groupId = config.group;// || ;
         var type = config.event;
-        var space = config.owner.split("-")[0]; //this avoid the multiple flow problem ì, i.e: space 3-14
+        var space = null;
+        if(RED.settings.exentriq && RED.settings.exentriq.defaultSpaceId){
+	        space = RED.settings.exentriq.defaultSpaceId;
+        }
+        else if(config && config.owner){
+	        space = config.owner.split("-")[0]; //this avoid the multiple flow problem ì, i.e: space 3-14
+        }
+        
+        
+        
+        
         var client; 
         var consumer;
 		
