@@ -47,6 +47,11 @@ function EmaGetEntity(n) {
 		    path = msg.api;
 	    }
 	    
+	    var hMethod = "GET";
+	    if(msg.method){
+		    hMethod = msg.method;
+	    }
+	    
 	    
 	    
 		/*if(msg.token){
@@ -69,7 +74,7 @@ function EmaGetEntity(n) {
 	    var post_options = {
 	      "host": host,
 	      "path": path,
-	      "method": "GET",
+	      "method": hMethod,
               "headers": {
 			  	"Content-Type": "application/json",
 			  	"x-user-name": node.robotUsername,
