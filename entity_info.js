@@ -14,6 +14,7 @@ function EmaGetEntity(n) {
 	this.robotPassword = n.rpassword;
 	this.robotSessionToken = null;
 	this.format = n.format;
+	this.api = n.api;
 	
 	var exentriqServicePath = RED.settings.exentriq.rpc;;
 	var node = this;
@@ -41,6 +42,13 @@ function EmaGetEntity(n) {
 		node.name = msg.name;
 	    }
 	    
+	    var path = "/api/entity/"+msg.entity
+	    if(msg.api){
+		    path = msg.api;
+	    }
+	    
+	    
+	    
 		/*if(msg.token){
 			node.robotSessionToken = msg.token;
 	    }
@@ -60,7 +68,7 @@ function EmaGetEntity(n) {
 	    
 	    var post_options = {
 	      "host": host,
-	      "path": "/api/entity/"+msg.entity,
+	      "path": path,
 	      "method": "GET",
               "headers": {
 			  	"Content-Type": "application/json",
