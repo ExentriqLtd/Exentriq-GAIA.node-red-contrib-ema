@@ -32,8 +32,6 @@ module.exports = function(RED) {
 		
         topics = [{topic:"NewObjectEvent"}, {topic:"DeleteObjectEvent"}];      
 
-
-
         var options = {
             groupId: groupId,
             autoCommit: true,
