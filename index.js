@@ -30,11 +30,7 @@ function EmaMoveCard(n) {
 	    }
 	    	    
 	    var data = { "destinationId":node.destination_list, "sourceListId":node.source_list, "username": node.username };
-	    
-	    
 	    node.log("Move card:  " + msg.card);
-	    
-	    //node.send(msg);
 	    
 	    var post_data = JSON.stringify(data);
 	    
